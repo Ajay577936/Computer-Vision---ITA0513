@@ -1,0 +1,19 @@
+import cv2
+import matplotlib.pyplot as plt
+video_path = "/content/4052826-uhd_3840_2160_25fps.mp4"
+cap = cv2.VideoCapture(video_path)
+if not cap.isOpened():
+    print(f"Error: Cannot open video at '{video_path}'. Please ensure the video file exists at this path.")
+else:
+    print(f"Video '{video_path}' opened successfully.")
+    ret, frame = cap.read()
+    if ret:
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        plt.figure(figsize=(10, 6))
+        plt.imshow(rgb_frame)
+        plt.title("First Frame of the Video")
+        plt.axis('off')
+        plt.show()
+    else:
+        print("Failed to capture frame from the video.")
+cap.release()
