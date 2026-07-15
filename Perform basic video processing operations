@@ -1,0 +1,30 @@
+import cv2
+import matplotlib.pyplot as plt
+from IPython.display import Image, display
+import io
+video_path = "/content/file_example_MP4_480_1_5MG.mp4" 
+video = cv2.VideoCapture(video_path)
+if not video.isOpened():
+    print(f"Error: Cannot open video at '{video_path}'. Please ensure the video file exists at this path.")
+else:
+    print(f"Video '{video_path}' opened successfully.")
+    # Read the first frame
+    ret, frame = video.read()
+    if ret:
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        print("Displaying Original Frame (first frame):")
+        plt.figure(figsize=(8, 4))
+        plt.subplot(1, 2, 1)
+        plt.imshow(rgb_frame)
+        plt.title("Original Video Frame")
+        plt.axis('off')
+        plt.subplot(1, 2, 2)
+        plt.imshow(gray, cmap='gray')
+        plt.title("Grayscale Video Frame")
+        plt.axis('off')
+        plt.show()
+gray.shape[0]), isColor=False)
+    else:
+        print("Error: Could not read a frame from the video.")
+video.release()
