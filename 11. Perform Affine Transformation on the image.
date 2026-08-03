@@ -1,0 +1,55 @@
+# Install OpenCV
+!pip install opencv-python
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from skimage import data
+
+# Load sample image
+img = data.astronaut()
+
+# Convert RGB to BGR (OpenCV format)
+img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+
+rows, cols = img.shape[:2]
+
+# Select three points from original image
+pts1 = np.float32([[50, 50],
+                   [200, 50],
+                   [50, 200]])
+
+# Corresponding points after transformation
+pts2 = np.float32([[10, 100],
+                   [200, 50],
+                   [100, 250]])
+
+# Compute Affine Transformation Matrix
+M = cv2.getAffineTransform(pts1, pts2)
+
+# Apply Affine Transformation
+affine = cv2.warpAffine(img, M, (cols, rows))
+
+# Convert back to RGB for display
+original = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+affine = cv2.cvtColor(affine, cv2.COLOR_BGR2RGB)
+
+# Display Images
+plt.figure(figsize=(12,6))
+
+plt.subplot(1,2,1)
+plt.imshow(original)
+plt.title("Original Image")
+plt.axis("off")
+
+plt.subplot(1,2,2)
+plt.imshow(affine)
+plt.title("Affine Transformed Image")
+plt.axis("off")
+
+plt.show()
+
+# Save Output
+cv2.imwrite("affine_transformed.jpg", cv2.cvtColor(affine, cv2.COLOR_RGB2BGR))
+
+print("Affine Transformation completed successfully!")
