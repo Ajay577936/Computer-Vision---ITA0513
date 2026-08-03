@@ -1,0 +1,51 @@
+# Install OpenCV
+!pip install opencv-python
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from skimage import data
+
+# Load sample image
+img = data.astronaut()
+
+# Convert RGB to BGR for OpenCV
+img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+
+# Get image dimensions
+rows, cols = img.shape[:2]
+
+# Translation values
+tx = 100   # Move right by 100 pixels
+ty = 50    # Move down by 50 pixels
+
+# Translation Matrix
+M = np.float32([[1, 0, tx],
+                [0, 1, ty]])
+
+# Apply Translation
+translated = cv2.warpAffine(img, M, (cols, rows))
+
+# Convert back to RGB
+original = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+translated = cv2.cvtColor(translated, cv2.COLOR_BGR2RGB)
+
+# Display Images
+plt.figure(figsize=(12,6))
+
+plt.subplot(1,2,1)
+plt.imshow(original)
+plt.title("Original Image")
+plt.axis("off")
+
+plt.subplot(1,2,2)
+plt.imshow(translated)
+plt.title("Translated Image")
+plt.axis("off")
+
+plt.show()
+
+# Save translated image
+cv2.imwrite("translated_image.jpg", cv2.cvtColor(translated, cv2.COLOR_RGB2BGR))
+
+print("Translation completed successfully!")
