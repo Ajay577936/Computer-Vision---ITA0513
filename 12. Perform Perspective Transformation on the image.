@@ -1,0 +1,63 @@
+# Install OpenCV
+!pip install opencv-python
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from skimage import data
+
+# Load sample image
+img = data.astronaut()
+
+# Convert RGB to BGR (OpenCV format)
+img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+
+# Get image dimensions
+rows, cols = img.shape[:2]
+
+# Define four source points
+pts1 = np.float32([
+    [50, 50],
+    [450, 50],
+    [50, 450],
+    [450, 450]
+])
+
+# Define four destination points
+pts2 = np.float32([
+    [10, 100],
+    [450, 50],
+    [100, 450],
+    [400, 400]
+])
+
+# Compute Perspective Transformation Matrix
+M = cv2.getPerspectiveTransform(pts1, pts2)
+
+# Apply Perspective Transformation
+perspective = cv2.warpPerspective(img, M, (cols, rows))
+
+# Convert back to RGB for display
+original = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+perspective = cv2.cvtColor(perspective, cv2.COLOR_BGR2RGB)
+
+# Display Images
+plt.figure(figsize=(12,6))
+
+plt.subplot(1,2,1)
+plt.imshow(original)
+plt.title("Original Image")
+plt.axis("off")
+
+plt.subplot(1,2,2)
+plt.imshow(perspective)
+plt.title("Perspective Transformed Image")
+plt.axis("off")
+
+plt.show()
+
+# Save Output
+cv2.imwrite("perspective_transformed.jpg",
+            cv2.cvtColor(perspective, cv2.COLOR_RGB2BGR))
+
+print("Perspective Transformation completed successfully!")
