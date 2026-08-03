@@ -1,0 +1,62 @@
+# Install OpenCV
+!pip install opencv-python
+
+import cv2
+import numpy as np
+from google.colab import files
+
+# Upload video
+uploaded = files.upload()
+
+video_path = list(uploaded.keys())[0]
+
+# Open video
+cap = cv2.VideoCapture(video_path)
+
+# Get video properties
+width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+fps = cap.get(cv2.CAP_PROP_FPS)
+
+# Output video
+output_file = "perspective_output.mp4"
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+out = cv2.VideoWriter(output_file, fourcc, fps, (width, height))
+
+# Source points
+pts1 = np.float32([
+    [50, 50],
+    [width-50, 50],
+    [50, height-50],
+    [width-50, height-50]
+])
+
+# Destination points
+pts2 = np.float32([
+    [100, 100],
+    [width-100, 50],
+    [50, height-100],
+    [width-100, height-50]
+])
+
+# Perspective transformation matrix
+M = cv2.getPerspectiveTransform(pts1, pts2)
+
+# Process each frame
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    transformed = cv2.warpPerspective(frame, M, (width, height))
+    out.write(transformed)
+
+# Release resources
+cap.release()
+out.release()
+
+print("Perspective Transformation completed successfully!")
+print("Saved as:", output_file)
+
+# Download the output video
+files.download(output_file)
