@@ -1,0 +1,50 @@
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from google.colab import files
+uploaded = files.upload()
+filename = list(uploaded.keys())[0]
+img = cv2.imread(filename)
+if img is None:
+    print("Error: Image not found")
+else:
+    h, w = img.shape[:2]
+    src = np.float32([
+        [50, 50],
+        [w-50, 50],
+        [w-50, h-50],
+        [50, h-50]
+    ])
+    dst = np.float32([
+        [100, 20],
+        [w-120, 60],
+        [w-80, h-80],
+        [60, h-40]
+    ])
+
+    # -----------------------------
+    # Direct Linear Transformation
+    # -----------------------------
+    A = []
+    for (x, y), (u, v) in zip(src, dst):
+        A.append([-x, -y, -1, 0, 0, 0, x*u, y*u, u])
+        A.append([0, 0, 0, -x, -y, -1, x*v, y*v, v])
+    A = np.array(A)
+    U, S, Vt = np.linalg.svd(A)
+    H = Vt[-1].reshape(3, 3)
+    H = H / H[2, 2]
+    print("Homography Matrix calculated using DLT:")
+    print(H)
+    result = cv2.warpPerspective(img, H, (w, h))
+    original = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    transformed = cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
+    plt.figure(figsize=(12, 5))
+    plt.subplot(1, 2, 1)
+    plt.imshow(original)
+    plt.title("Original Image")
+    plt.axis("off")
+    plt.subplot(1, 2, 2)
+    plt.imshow(transformed)
+    plt.title("DLT Transformed Image")
+    plt.axis("off")
+    plt.show()
