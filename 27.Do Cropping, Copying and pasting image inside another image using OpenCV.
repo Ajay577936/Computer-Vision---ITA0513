@@ -1,0 +1,75 @@
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from google.colab import files
+from PIL import Image
+import io
+print("Upload SOURCE image:")
+uploaded_source = files.upload()
+source_file = next(iter(uploaded_source)
+source_pil = Image.open(
+    io.BytesIO(uploaded_source[source_file])
+).convert("RGB")
+source = np.array(source_pil)
+source = cv2.cvtColor(source, cv2.COLOR_RGB2BGR)
+print("Source image loaded successfully!")
+print("Upload DESTINATION image:")
+uploaded_destination = files.upload()
+destination_file = next(iter(uploaded_destination))
+destination_pil = Image.open(
+    io.BytesIO(uploaded_destination[destination_file])
+).convert("RGB")
+destination = np.array(destination_pil)
+destination = cv2.cvtColor(destination, cv2.COLOR_RGB2BGR) 
+print("Destination image loaded successfully!")
+x1 = 50
+y1 = 50
+x2 = 250
+y2 = 250
+cropped = source[y1:y2, x1:x2]
+print("Image cropped successfully!")
+cropped = cv2.resize(cropped, (200, 200))
+paste_x = 100
+paste_y = 100
+crop_height, crop_width = cropped.shape[:2]
+# Check whether it fits
+if (paste_y + crop_height <= destination.shape[0] and
+    paste_x + crop_width <= destination.shape[1]):
+    destination[
+        paste_y:paste_y + crop_height,
+        paste_x:paste_x + crop_width
+    ] = cropped
+
+else:
+    print("Cropped image does not fit!")
+    raise SystemExit
+
+source_rgb = cv2.cvtColor(source, cv2.COLOR_BGR2RGB)
+cropped_rgb = cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB)
+destination_rgb = cv2.cvtColor(destination, cv2.COLOR_BGR2RGB)
+plt.figure(figsize=(15, 5))
+plt.subplot(1, 3, 1)
+plt.imshow(source_rgb)
+plt.title("Source Image")
+plt.axis("off")
+plt.subplot(1, 3, 2)
+plt.imshow(cropped_rgb)
+plt.title("Cropped Image")
+plt.axis("off")
+plt.subplot(1, 3, 3)
+plt.imshow(destination_rgb)
+plt.title("Final Image")
+plt.axis("off")
+plt.tight_layout()
+plt.show()
+cv2.imwrite(
+    "Cropped_Copied_Pasted_Image.jpg",
+    destination
+)
+print("====================================")
+print("Cropping completed successfully!")
+print("Copying completed successfully!")
+print("Pasting completed successfully!")
+print("Output saved as:")
+print("Cropped_Copied_Pasted_Image.jpg")
+print("====================================")
