@@ -1,0 +1,74 @@
+# Experiment 26: Insert Watermark to the Image using OpenCV
+
+import cv2
+import matplotlib.pyplot as plt
+from google.colab import files
+
+# Upload Input Image
+uploaded = files.upload()
+
+filename = next(iter(uploaded))
+
+# Read image
+image = cv2.imread(filename)
+
+if image is None:
+    print("Error: Unable to read the image!")
+else:
+    # Watermark name
+    watermark = "Ajay"
+
+    # Get image dimensions
+    height, width = image.shape[:2]
+
+    # Font settings
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 1.5
+    thickness = 3
+
+    # Get text size
+    text_size = cv2.getTextSize(
+        watermark, font, font_scale, thickness
+    )[0]
+
+    # Bottom-right position
+    x = width - text_size[0] - 20
+    y = height - 20
+
+    # Insert watermark
+    cv2.putText(
+        image,
+        watermark,
+        (x, y),
+        font,
+        font_scale,
+        (255, 255, 255),
+        thickness,
+        cv2.LINE_AA
+    )
+
+    # Convert for display
+    output = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    # Display result
+    plt.figure(figsize=(12, 6))
+
+    plt.subplot(1, 2, 1)
+    original = cv2.imread(filename)
+    original_rgb = cv2.cvtColor(original, cv2.COLOR_BGR2RGB)
+    plt.imshow(original_rgb)
+    plt.title("Original Image")
+    plt.axis("off")
+
+    plt.subplot(1, 2, 2)
+    plt.imshow(output)
+    plt.title("Watermarked Image - Ajay")
+    plt.axis("off")
+
+    plt.tight_layout()
+    plt.show()
+
+    # Save output
+    cv2.imwrite("Watermarked_Ajay.jpg", image)
+
+    print("Watermark 'Ajay' inserted successfully!")
