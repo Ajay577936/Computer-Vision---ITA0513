@@ -1,0 +1,70 @@
+# Experiment: Sharpening of Image using High-Boost Masks
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from google.colab import files
+
+# Upload Input Image
+uploaded = files.upload()
+
+# Read the uploaded image
+filename = next(iter(uploaded))
+image = cv2.imread(filename)
+
+# Check whether image is loaded
+if image is None:
+    print("Error: Image not found!")
+else:
+    # Convert BGR to RGB
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    # Convert to grayscale
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    # Apply Gaussian Blur
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+
+    # Create High-Boost Mask
+    mask = cv2.subtract(gray, blurred)
+
+    # High-Boost Filtering
+    A = 2.0
+    sharpened = cv2.addWeighted(gray, A, blurred, -(A - 1), 0)
+
+    # Display images
+    plt.figure(figsize=(15, 8))
+
+    plt.subplot(2, 3, 1)
+    plt.imshow(image_rgb)
+    plt.title("Input Image")
+    plt.axis("off")
+
+    plt.subplot(2, 3, 2)
+    plt.imshow(gray, cmap="gray")
+    plt.title("Grayscale Image")
+    plt.axis("off")
+
+    plt.subplot(2, 3, 3)
+    plt.imshow(blurred, cmap="gray")
+    plt.title("Blurred Image")
+    plt.axis("off")
+
+    plt.subplot(2, 3, 4)
+    plt.imshow(mask, cmap="gray")
+    plt.title("High-Boost Mask")
+    plt.axis("off")
+
+    plt.subplot(2, 3, 5)
+    plt.imshow(sharpened, cmap="gray")
+    plt.title("Sharpened Image")
+    plt.axis("off")
+
+    plt.tight_layout()
+    plt.show()
+
+    # Save output
+    cv2.imwrite("High_Boost_Sharpened_Image.jpg", sharpened)
+
+    print("Input Image:", filename)
+    print("High-Boost Sharpening Completed Successfully!")
