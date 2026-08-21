@@ -1,0 +1,58 @@
+import cv2
+import matplotlib.pyplot as plt
+from google.colab import files
+uploaded = files.upload()
+filename = next(iter(uploaded))
+image = cv2.imread(filename)
+image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+!wget -q https://raw.githubusercontent.com/chuanqi305/MobileNet-SSD/master/deploy.prototxt
+!wget -q https://github.com/chuanqi305/MobileNet-SSD/raw/master/mobilenet_iter_73000.caffemodel
+net = cv2.dnn.readNetFromCaffe(
+    "deploy.prototxt",
+    "mobilenet_iter_73000.caffemodel"
+)
+classes = [
+    "background", "aeroplane", "bicycle", "bird", "boat",
+    "bottle", "bus", "car", "cat", "chair", "cow",
+    "diningtable", "dog", "horse", "motorbike", "person",
+    "pottedplant", "sheep", "sofa", "train", "tvmonitor"
+]
+(h, w) = image.shape[:2]
+blob = cv2.dnn.blobFromImage(
+    cv2.resize(image, (300, 300)),
+    0.007843,
+    (300, 300),
+    127.5
+)
+net.setInput(blob)
+detections = net.forward()
+for i in range(detections.shape[2]):
+    confidence = detections[0, 0, i, 2]
+    if confidence > 0.50:
+        class_id = int(detections[0, 0, i, 1])
+        if class_id < len(classes):
+            label = classes[class_id]
+            box = detections[0, 0, i, 3:7] * \
+                  [w, h, w, h]
+            (startX, startY, endX, endY) = box.astype("int")
+            cv2.rectangle(
+                image_rgb,
+                (startX, startY),
+                (endX, endY),
+                (0, 255, 0),
+                2
+            )
+            cv2.putText(
+                image_rgb,
+                f"{label}: {confidence:.2f}",
+                (startX, max(startY - 10, 20)),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.6,
+                (0, 255, 0),
+                2
+            )
+plt.figure(figsize=(10, 7))
+plt.imshow(image_rgb)
+plt.title("General Object Recognition")
+plt.axis("off")
+plt.show()
